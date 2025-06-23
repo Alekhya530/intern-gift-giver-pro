@@ -257,12 +257,15 @@ export const generateEventPlan = (requirements: EventRequirements): EventPlan =>
       const template = eventTemplates[requirements.eventType as keyof typeof eventTemplates] || eventTemplates.corporate;
       const categoryBudget = (template.budgetAllocation[vendor.category] || 0.1) * requirements.budget;
       
+      // Fix the priority type issue by ensuring proper literal type assignment
+      const priority: 'high' | 'medium' | 'low' = score >= 70 ? 'high' : score >= 50 ? 'medium' : 'low';
+      
       return {
         vendor,
         score,
         reasoning,
         estimatedCost: Math.min(categoryBudget, (vendor.priceRange.min + vendor.priceRange.max) / 2),
-        priority: score >= 70 ? 'high' : score >= 50 ? 'medium' : 'low'
+        priority
       };
     })
     .filter(rec => rec.score > 30) // Filter out very low scores
